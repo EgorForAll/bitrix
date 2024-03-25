@@ -29,4 +29,30 @@ _GetList_ - Возвращает список элементов по фильт
   false
 );`
 
-Посмотреть свойства элементов можно в админке в карточке сущности инфоблока, используя DEV*TOOLS, либо в разделе *Инфоблоки->{РАЗДЕЛ ИНФОБЛОКА}->Свойства\_
+Посмотреть свойства элементов можно в админке в карточке сущности инфоблока, используя DEV*TOOLS, либо в разделе *Инфоблоки->{РАЗДЕЛ ИНФОБЛОКА}->Свойства\*
+
+## Получение AJAX
+
+Чтобы получить и обработать запрос AJAX в Bitrix необходимо использовать следующее API:
+
+`$request = \Bitrix\Main\Context::getCurrent()->getRequest();
+$value = $request->getPost("path");
+`
+Где _$value_ - это параметр POST запроса.
+
+Тело запроса отправляется в формате - _application/x-www-form-urlencoded_
+
+[Документация](https://dev.1c-bitrix.ru/api_d7/bitrix/main/request/index.php)
+
+## Проверить наличие файла
+
+Чтобы проверить наличие файла, можно воспольтзоваться специальным классом BITRIX - `string
+CFile::CheckFile(
+	array file,
+	int max_size = 0,
+	string mime_types = false,
+	string Ext = false,
+	bool ForceMD5=false,
+	bool SkipExt=false
+)`
+[Документация](https://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php)
