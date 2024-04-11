@@ -55,4 +55,79 @@ CFile::CheckFile(
 	bool ForceMD5=false,
 	bool SkipExt=false
 )`
+
 [Документация](https://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php)
+
+## Создание веб-страницы в bitrix
+
+Чтобы создать страницу в Bitrix, необходимо в корне проекта создать директорию и назвать ее именем страницы.
+В директории необходимо создать файл index.php. В нем вызываются хедер и футер:
+`<? require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php');`
+`<? require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php');?>`
+
+Между вызовами хедера и футера необзодимо ключить шаблон компонента:
+
+`
+$APPLICATION->IncludeComponent(
+'toledo:seasonal.dom-i-sad',
+'.default',
+[
+'ELEMENT_ID_SEASONAL' => 196717,
+'IBLOCK_ID' => 15,
+'IBLOCK_ID_MULTIREGION' => 37,
+'BASE_PRICE' => '7',
+'CHUNKS' => [8, 7, 8, 9],
+'CAROUSEL' => [
+[109718, 109717, 107995, 108906, 112141, 112770, 129255, 196360],
+],
+'DETAIL_LINK' => '/products/',
+'SEASON_TYPE' => 'dom-i-sad',
+'SERVER_IMAGES' => 'https://img.toledo24.pro/'
+],
+false
+);
+`
+
+Шаблон компонента создается в директории `local/components`. 
+Вторым параметром указывается папка в которой расположен шаблон компонента. В данном случае это `.default`.
+Третим параметром передается массив с параметрами, которые затем можно использовать в шаблоне компонента.
+
+В директории компонента обязательно необходимо создать файл class.php.
+
+Это файл класса который наследуется от глобального класса Bitrix `CBitrixComponent`.
+В классе для инициализации компонента необходимо создать публичный метод `executeComponent`.
+
+Вот пример компонента:
+
+`
+class SeasonDacha extends CBitrixComponent
+{
+
+    private array $basket = [];
+
+    public function executeComponent(): void
+    {
+        $arBaseBlockInfo = $this->getBaseBlockInfo();
+        $allProductIdList = $this->mergeCarouselIdList($arBaseBlockInfo);
+        $allProductInfoList = $this->getInfoProductCardInfo($allProductIdList);
+        $splitedProductIdList = $this->splitProductIdList($arBaseBlockInfo);
+        $this->arResult = [
+            'PROMO_INFO' => $arBaseBlockInfo,
+            'PRODUCT_INFO_LIST' => $allProductInfoList,
+            'CHUNCKS_ID_LIST' => $splitedProductIdList,
+            'CAROUSEL_ID_LIST' => $this->arParams['CAROUSEL'],
+            'BASKET' => $this->basket,
+        ];
+
+        $this->includeComponentTemplate();
+    }
+
+    ... 
+}
+`
+
+Для передачи данных из класса в шаблон используется зарезервированная переменная `$arResult`, которая является ассоциативным массивом.
+Для ренедеринга компонета используется метод глоьального класса `includeComponentTemplate()`.
+
+В директории .default создается файл `template.php,` в котором прописывается вертска компонента.
+По соседству в этой диреткории можно создать файл `style.css,` который будет автоматические обрабатывать стили компонента.
